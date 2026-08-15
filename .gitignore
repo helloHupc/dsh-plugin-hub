@@ -1,0 +1,5 @@
+# 构建产物(EdgeOne 构建时从 data/plugins.json 复制生成)
+site/data/
+__pycache__/
+*.pyc
+.DS_Store

@@ -1,0 +1,43 @@
+name: refresh-data
+
+on:
+  schedule:
+    - cron: "0 * * * *"        # 每小时整点
+  workflow_dispatch: {}        # 手动触发
+
+permissions:
+  contents: write              # 允许提交更新的 data/plugins.json
+
+concurrency:
+  group: refresh
+  cancel-in-progress: false
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Run ETL (aggregate)
+        run: python3 scripts/aggregate.py
+
+      - name: Show stats
+        run: python3 -c "import json;d=json.load(open('data/plugins.json'));print('total',d['meta']['total'],'uncat',d['meta']['stats']['uncategorized'])"
+
+      - name: Commit & push if changed
+        run: |
+          git config user.name "dsh-hub-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add data/plugins.json data/raw/
+          if git diff --cached --quiet; then
+            echo "no changes"
+          else
+            git commit -m "chore(data): hourly refresh $(date -u +%Y-%m-%dT%H:%MZ)"
+            git push
+          fi

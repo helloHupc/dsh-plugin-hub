@@ -1,0 +1,4 @@
+{
+  "buildCommand": "mkdir -p site/data && cp data/plugins.json site/data/plugins.json",
+  "outputDirectory": "./site"
+}
