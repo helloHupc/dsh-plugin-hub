@@ -154,9 +154,13 @@
     const { request, env } = context;
     const url = new URL(request.url);
     const key = env.STATS_KEY;
-    if (!key || url.searchParams.get("key") !== key) {
+    const cookies = (request.headers.get("cookie") || "").split(";").map((c) => c.trim());
+    const authed = cookies.includes("dsh_stats_auth=1");
+    const keyOk = key && url.searchParams.get("key") === key;
+    if (!authed && !keyOk) {
       return new Response("Forbidden", { status: 403 });
     }
+    const setCookie = keyOk && !authed ? { "Set-Cookie": "dsh_stats_auth=1; Path=/; Max-Age=31536000; HttpOnly; SameSite=Lax; Secure" } : {};
     try {
       if (typeof my_kv === "undefined") {
         return html("KV \u672A\u7ED1\u5B9A", []);
@@ -178,7 +182,7 @@
       return html("DSH \u63D2\u4EF6\u805A\u5408\u7AD9 \xB7 \u8BBF\u95EE\u7EDF\u8BA1", [
         { title: "\u4ECA\u65E5", st: parse(t) },
         { title: "\u6628\u65E5", st: parse(y) }
-      ]);
+      ], setCookie);
     } catch (e) {
       return new Response("Error: " + e.message, { status: 500 });
     }
@@ -205,7 +209,7 @@
   <h3>\u56FD\u5BB6/\u5730\u533A</h3>
   <table><tr><th>\u5730\u533A</th><th>\u6B21\u6570</th></tr>${rows("geo", st.geos, 10) || empty}</table>`;
   }
-  function html(title, days) {
+  function html(title, days, extraHeaders) {
     const body = days.map((d) => table(d.title, d.st)).join("");
     return new Response(
       `<!DOCTYPE html><html lang="zh-CN"><head><meta charset="UTF-8">
@@ -222,7 +226,7 @@ th,td{text-align:left;padding:6px 10px;border-bottom:1px solid #26304a;font-size
 th{color:#8b96ad;font-weight:500;font-size:12px}
 td.num{text-align:right;color:#38c4a0}.dim{color:#5b667a}
 </style></head><body><h1>\u{1F40B} ${esc(title)}</h1>${body}</body></html>`,
-      { headers: { "content-type": "text/html; charset=UTF-8", "x-robots-tag": "noindex" } }
+      { headers: Object.assign({ "content-type": "text/html; charset=UTF-8", "x-robots-tag": "noindex" }, extraHeaders || {}) }
     );
   }
 
