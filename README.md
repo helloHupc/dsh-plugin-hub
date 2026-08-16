@@ -88,6 +88,10 @@ edgeone login
 edgeone makers deploy -n dsh-plugin-hub
 ```
 
+## 社区
+
+- [Linux.do](https://linux.do) — **学AI，上L站** 🐋
+
 ## 安全提示
 
 ⚠️ 安装第三方插件 = 以你的权限在本机运行第三方代码。本聚合站只做索引与分类,**不做安全审查**;
