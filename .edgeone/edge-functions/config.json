@@ -1,9 +1,6 @@
 {
   "routes": [
     {
-      "src": "^/api/diag$"
-    },
-    {
       "src": "^/api/stats$",
       "methods": [
         "GET"
