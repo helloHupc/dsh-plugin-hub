@@ -23,14 +23,14 @@ export async function onRequest(context) {
       }
     } catch (e) {}
 
-    waitUntil(record(env, { p, refHost, geo, ip }));
+    waitUntil(record({ p, refHost, geo, ip, ua }));
     return new Response(null, { status: 204 });
   } catch (e) {
     return new Response(null, { status: 204 });
   }
 }
 
-async function record(env, { p, refHost, geo, ip }) {
+async function record({ p, refHost, geo, ip, ua }) {
   try {
     if (typeof my_kv === "undefined") return;
     const now = new Date();
