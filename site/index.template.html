@@ -62,5 +62,6 @@
 </footer>
 
 <script src="app.js"></script>
+<script>addEventListener("load",()=>{try{navigator.sendBeacon("/api/t?p="+encodeURIComponent(location.pathname))}catch(e){}});</script>
 </body>
 </html>
