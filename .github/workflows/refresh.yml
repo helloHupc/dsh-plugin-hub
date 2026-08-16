@@ -41,3 +41,11 @@ jobs:
             git commit -m "chore(data): hourly refresh $(date -u +%Y-%m-%dT%H:%MZ)"
             git push
           fi
+
+      - name: Deploy to EdgeOne Makers
+        if: env.EDGEONE_PAGES_API_TOKEN != ''
+        env:
+          EDGEONE_PAGES_API_TOKEN: ${{ secrets.EDGEONE_PAGES_API_TOKEN }}
+        run: |
+          npm install -g edgeone@latest
+          edgeone makers deploy -n dsh-plugin-hub -e production
