@@ -10,16 +10,15 @@ export async function onRequestGet(context) {
     return new Response("Forbidden", { status: 403 });
   }
   try {
-    const kv = env.my_kv;
-    if (!kv) {
+    if (typeof my_kv === "undefined") {
       return html("KV 未绑定", []);
     }
     const now = new Date();
     const today = now.toISOString().slice(0, 10);
     const yday = new Date(now.getTime() - 86400000).toISOString().slice(0, 10);
     const [t, y] = await Promise.all([
-      kv.get("stats:" + today),
-      kv.get("stats:" + yday),
+      my_kv.get("stats:" + today),
+      my_kv.get("stats:" + yday),
     ]);
     const parse = (s) => {
       try {

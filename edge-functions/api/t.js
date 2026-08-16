@@ -32,8 +32,7 @@ export async function onRequest(context) {
 
 async function record(env, { p, refHost, geo, ip }) {
   try {
-    const kv = env.my_kv;
-    if (!kv) return;
+    if (typeof my_kv === "undefined") return;
     const now = new Date();
     const day = now.toISOString().slice(0, 10);
     const key = "stats:" + day;
@@ -45,15 +44,15 @@ async function record(env, { p, refHost, geo, ip }) {
       h = (h * 31 + s.charCodeAt(i)) | 0;
     }
     const hkey = "uv:" + day + ":" + (h >>> 0).toString(36);
-    const seen = (await kv.get(hkey)) !== null;
+    const seen = (await my_kv.get(hkey)) !== null;
     if (!seen) {
-      await kv.put(hkey, "1", { expirationTtl: 86400 });
+      await my_kv.put(hkey, "1", { expirationTtl: 86400 });
     }
 
     // 读当日聚合 JSON,更新后写回
     let st = {};
     try {
-      st = JSON.parse((await kv.get(key)) || "{}");
+      st = JSON.parse((await my_kv.get(key)) || "{}");
     } catch (e) {
       st = {};
     }
@@ -69,7 +68,7 @@ async function record(env, { p, refHost, geo, ip }) {
       st.pgs[p] = (st.pgs[p] || 0) + 1;
     }
     st.geos[geo] = (st.geos[geo] || 0) + 1;
-    await kv.put(key, JSON.stringify(st));
+    await my_kv.put(key, JSON.stringify(st));
   } catch (e) {
     // 埋点失败静默
   }
