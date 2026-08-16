@@ -25,6 +25,8 @@ jobs:
           python-version: "3.11"
 
       - name: Run ETL (aggregate)
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
         run: python3 scripts/aggregate.py
 
       - name: Build static SEO site

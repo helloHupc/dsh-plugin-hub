@@ -142,12 +142,16 @@ SOURCES = [
 # ---------------------------------------------------------------------------
 def http_get(url, binary=False):
     last = None
+    token = os.environ.get("GITHUB_TOKEN") or os.environ.get("GH_TOKEN")
     for i in range(RETRIES + 1):
         try:
-            req = urllib.request.Request(url, headers={
+            headers = {
                 "User-Agent": UA,
                 "Accept": "application/vnd.github+json" if "api.github.com" in url else "*/*",
-            })
+            }
+            if token and "api.github.com" in url:
+                headers["Authorization"] = f"Bearer {token}"
+            req = urllib.request.Request(url, headers=headers)
             # macOS 系统 Python 常缺 CA 证书:优先 certifi,否则回退无验证(仅读公开数据)
             ctx = None
             try:
