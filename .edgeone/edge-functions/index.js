@@ -146,16 +146,37 @@
           
         const runEdgeFunctions = () => {
           
+          if(!matchedFunc && '/api/diag' === urlInfo.pathname) {
+            matchedFunc = true;
+              (() => {
+  // edge-functions/api/diag.js
+  async function onRequest(context) {
+    const { env, request } = context;
+    const names = Object.keys(env || {});
+    const shapes = {};
+    for (const n of names) {
+      const v = env[n];
+      shapes[n] = typeof v === "object" && v !== null ? Object.keys(v).slice(0, 6) : typeof v;
+    }
+    return new Response(JSON.stringify({ names, shapes, url: request.url }, null, 2), {
+      headers: { "content-type": "application/json" }
+    });
+  }
+
+        pagesFunctionResponse = onRequest;
+      })();
+          }
+        
+
             if(!matchedFunc && '/api/stats' === urlInfo.pathname && request.method === 'GET') {
               matchedFunc = true;
                 (() => {
   // edge-functions/api/stats.js
-  var FALLBACK_KEY = "dsh-stats-8f3a2c";
   async function onRequestGet(context) {
     const { request, env } = context;
     const url = new URL(request.url);
-    const key = env.STATS_KEY || FALLBACK_KEY;
-    if (url.searchParams.get("key") !== key) {
+    const key = env.STATS_KEY;
+    if (!key || url.searchParams.get("key") !== key) {
       return new Response("Forbidden", { status: 403 });
     }
     try {
@@ -318,7 +339,7 @@ td.num{text-align:right;color:#38c4a0}.dim{color:#5b667a}
         const middlewareResponse = await runMiddleware({
           request,
           urlInfo: new URL(urlInfo.toString()),
-          env: {"ProjectId":"makers-tund5rgfervp","NG_CLI_ANALYTICS":"false","NUXT_TELEMETRY_DISABLED":"1","COREPACK_ENABLE_DOWNLOAD_PROMPT":"0","COREPACK_ENABLE_STRICT":"0","YARN_ENABLE_INTERACTIVE":"0","NPM_CONFIG_YES":"true","CI":"true","TMPDIR":"/var/folders/7k/kg5x1vrn5m778jhbjbtx9ty80000gn/T/","EDGEONE_PROJECT_ID":"makers-tund5rgfervp","PAGES_PROJECT_ID":"makers-tund5rgfervp"},
+          env: {"ProjectId":"makers-tund5rgfervp","NG_CLI_ANALYTICS":"false","NUXT_TELEMETRY_DISABLED":"1","COREPACK_ENABLE_DOWNLOAD_PROMPT":"0","COREPACK_ENABLE_STRICT":"0","YARN_ENABLE_INTERACTIVE":"0","NPM_CONFIG_YES":"true","CI":"true","TMPDIR":"/var/folders/7k/kg5x1vrn5m778jhbjbtx9ty80000gn/T/","STATS_KEY":"d1cf0f72e368a0e9fa86b21d2576a3e9bcc1ac0e01a1cf35","EDGEONE_PROJECT_ID":"makers-tund5rgfervp","PAGES_PROJECT_ID":"makers-tund5rgfervp"},
           waitUntil,
           hookCtx
         });
@@ -480,7 +501,7 @@ td.num{text-align:right;color:#38c4a0}.dim{color:#5b667a}
             }
 
           }
-          const edgeFunctionResponse = await pagesFunctionResponse({request, params, env: {"ProjectId":"makers-tund5rgfervp","NG_CLI_ANALYTICS":"false","NUXT_TELEMETRY_DISABLED":"1","COREPACK_ENABLE_DOWNLOAD_PROMPT":"0","COREPACK_ENABLE_STRICT":"0","YARN_ENABLE_INTERACTIVE":"0","NPM_CONFIG_YES":"true","CI":"true","TMPDIR":"/var/folders/7k/kg5x1vrn5m778jhbjbtx9ty80000gn/T/","EDGEONE_PROJECT_ID":"makers-tund5rgfervp","PAGES_PROJECT_ID":"makers-tund5rgfervp"}, waitUntil, eo });
+          const edgeFunctionResponse = await pagesFunctionResponse({request, params, env: {"ProjectId":"makers-tund5rgfervp","NG_CLI_ANALYTICS":"false","NUXT_TELEMETRY_DISABLED":"1","COREPACK_ENABLE_DOWNLOAD_PROMPT":"0","COREPACK_ENABLE_STRICT":"0","YARN_ENABLE_INTERACTIVE":"0","NPM_CONFIG_YES":"true","CI":"true","TMPDIR":"/var/folders/7k/kg5x1vrn5m778jhbjbtx9ty80000gn/T/","STATS_KEY":"d1cf0f72e368a0e9fa86b21d2576a3e9bcc1ac0e01a1cf35","EDGEONE_PROJECT_ID":"makers-tund5rgfervp","PAGES_PROJECT_ID":"makers-tund5rgfervp"}, waitUntil, eo });
 
           // 如果中间件设置了响应头，合并到边缘函数响应中
           if (middlewareResponseHeaders && edgeFunctionResponse) {
@@ -503,7 +524,7 @@ td.num{text-align:right;color:#38c4a0}.dim{color:#5b667a}
           }
 
           return edgeFunctionResponse;
-        })({request: ev.request, params: {}, env: {"ProjectId":"makers-tund5rgfervp","NG_CLI_ANALYTICS":"false","NUXT_TELEMETRY_DISABLED":"1","COREPACK_ENABLE_DOWNLOAD_PROMPT":"0","COREPACK_ENABLE_STRICT":"0","YARN_ENABLE_INTERACTIVE":"0","NPM_CONFIG_YES":"true","CI":"true","TMPDIR":"/var/folders/7k/kg5x1vrn5m778jhbjbtx9ty80000gn/T/","EDGEONE_PROJECT_ID":"makers-tund5rgfervp","PAGES_PROJECT_ID":"makers-tund5rgfervp"}, waitUntil: ev.waitUntil.bind(ev) });
+        })({request: ev.request, params: {}, env: {"ProjectId":"makers-tund5rgfervp","NG_CLI_ANALYTICS":"false","NUXT_TELEMETRY_DISABLED":"1","COREPACK_ENABLE_DOWNLOAD_PROMPT":"0","COREPACK_ENABLE_STRICT":"0","YARN_ENABLE_INTERACTIVE":"0","NPM_CONFIG_YES":"true","CI":"true","TMPDIR":"/var/folders/7k/kg5x1vrn5m778jhbjbtx9ty80000gn/T/","STATS_KEY":"d1cf0f72e368a0e9fa86b21d2576a3e9bcc1ac0e01a1cf35","EDGEONE_PROJECT_ID":"makers-tund5rgfervp","PAGES_PROJECT_ID":"makers-tund5rgfervp"}, waitUntil: ev.waitUntil.bind(ev) });
         // ↑ 用户原始代码结束
       }
 
