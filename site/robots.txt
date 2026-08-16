@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://dsh-plugin-hub.hupc.site/sitemap.xml
