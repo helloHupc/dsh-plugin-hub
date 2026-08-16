@@ -152,15 +152,12 @@
   // edge-functions/api/diag.js
   async function onRequest(context) {
     const { env, request } = context;
-    const names = Object.keys(env || {});
-    const shapes = {};
-    for (const n of names) {
-      const v = env[n];
-      shapes[n] = typeof v === "object" && v !== null ? Object.keys(v).slice(0, 6) : typeof v;
-    }
-    return new Response(JSON.stringify({ names, shapes, url: request.url }, null, 2), {
-      headers: { "content-type": "application/json" }
-    });
+    return new Response(JSON.stringify({
+      my_kv_global: typeof my_kv !== "undefined",
+      env_has_my_kv: Object.keys(env || {}).includes("my_kv"),
+      env_names: Object.keys(env || {}),
+      url: request.url
+    }, null, 2), { headers: { "content-type": "application/json" } });
   }
 
         pagesFunctionResponse = onRequest;
@@ -180,16 +177,15 @@
       return new Response("Forbidden", { status: 403 });
     }
     try {
-      const kv = env.my_kv;
-      if (!kv) {
+      if (typeof my_kv === "undefined") {
         return html("KV \u672A\u7ED1\u5B9A", []);
       }
       const now = /* @__PURE__ */ new Date();
       const today = now.toISOString().slice(0, 10);
       const yday = new Date(now.getTime() - 864e5).toISOString().slice(0, 10);
       const [t, y] = await Promise.all([
-        kv.get("stats:" + today),
-        kv.get("stats:" + yday)
+        my_kv.get("stats:" + today),
+        my_kv.get("stats:" + yday)
       ]);
       const parse = (s) => {
         try {
@@ -286,8 +282,7 @@ td.num{text-align:right;color:#38c4a0}.dim{color:#5b667a}
   }
   async function record(env, { p, refHost, geo, ip }) {
     try {
-      const kv = env.my_kv;
-      if (!kv)
+      if (typeof my_kv === "undefined")
         return;
       const now = /* @__PURE__ */ new Date();
       const day = now.toISOString().slice(0, 10);
@@ -298,13 +293,13 @@ td.num{text-align:right;color:#38c4a0}.dim{color:#5b667a}
         h = h * 31 + s.charCodeAt(i) | 0;
       }
       const hkey = "uv:" + day + ":" + (h >>> 0).toString(36);
-      const seen = await kv.get(hkey) !== null;
+      const seen = await my_kv.get(hkey) !== null;
       if (!seen) {
-        await kv.put(hkey, "1", { expirationTtl: 86400 });
+        await my_kv.put(hkey, "1", { expirationTtl: 86400 });
       }
       let st = {};
       try {
-        st = JSON.parse(await kv.get(key) || "{}");
+        st = JSON.parse(await my_kv.get(key) || "{}");
       } catch (e) {
         st = {};
       }
@@ -321,7 +316,7 @@ td.num{text-align:right;color:#38c4a0}.dim{color:#5b667a}
         st.pgs[p] = (st.pgs[p] || 0) + 1;
       }
       st.geos[geo] = (st.geos[geo] || 0) + 1;
-      await kv.put(key, JSON.stringify(st));
+      await my_kv.put(key, JSON.stringify(st));
     } catch (e) {
     }
   }

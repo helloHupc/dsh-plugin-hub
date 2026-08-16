@@ -46,7 +46,7 @@ async function record(env, { p, refHost, geo, ip }) {
     const hkey = "uv:" + day + ":" + (h >>> 0).toString(36);
     const seen = (await my_kv.get(hkey)) !== null;
     if (!seen) {
-      await my_kv.put(hkey, "1", { expirationTtl: 86400 });
+      await my_kv.put(hkey, "1");
     }
 
     // 读当日聚合 JSON,更新后写回
