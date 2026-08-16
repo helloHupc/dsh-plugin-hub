@@ -1,31 +1,9 @@
 # 🐋 DSH 插件聚合站
 
 全网 [DeepSeek Harness](https://github.com/deepseek-ai/deepseek-harness) (dsh) 插件聚合检测站:
-多数据源自动汇总 → 自己的逻辑去重/分类/排序 → 静态页检索,每小时刷新,EdgeOne Makers 托管(国内外可访问)。
+多数据源自动汇总 → 自己的逻辑去重/分类/排序 → 静态页检索,每小时刷新。
 
-线上地址:部署后由 EdgeOne Makers 提供(见下方部署)。
-
-## 数据流
-
-```
-GitHub Actions cron (每小时整点)
-   │
-   ▼
-scripts/aggregate.py (零依赖 Python ETL)
-   ├─ 6 个数据源实时拉取(失败回退本地缓存)
-   ├─ 合并 + 去重(唯一键 owner/name,monorepo 子包按 path 区分)
-   ├─ 自己的关键词规则分类器(16 类,多标签,词边界匹配)
-   └─ 输出 data/plugins.json
-   │
-   ▼
-git push(数据变化时)
-   │
-   ▼
-EdgeOne Makers 监听 GitHub → 自动构建部署(edgeone.json: outputDirectory=site)
-   │
-   ▼
-静态前端(site/):搜索 / 分类筛选 / 排序 / 分页,全部本地执行
-```
+线上地址:
 
 ## 数据源(6 个)
 
@@ -63,7 +41,6 @@ cd site && python3 -m http.server 8000
 ├── data/plugins.json        # 合并产物(每小时刷新)
 ├── data/raw/                # 各源缓存(失败回退)
 ├── site/                    # 静态前端(index.html / app.js / style.css)
-├── edgeone.json             # Makers 构建配置
 └── .github/workflows/refresh.yml  # 每小时 cron
 ```
 
@@ -73,20 +50,6 @@ GitHub Actions `refresh-data` workflow:
 - `cron: 0 * * * *` 每小时整点 + 手动 `workflow_dispatch`
 - 跑 ETL → 数据有变化才 commit + push(不刷空提交)
 - 失败时 GitHub 原生邮件通知仓库操作者,零第三方依赖
-
-## 部署到 EdgeOne Makers
-
-1. EdgeOne Makers 控制台创建项目(静态类型),关联本 GitHub 仓库
-2. 构建配置读取 `edgeone.json`:`buildCommand` 把 `data/plugins.json` 复制进 `site/data/`,输出目录 `site/`
-3. 之后每次 push(含每小时数据刷新)自动触发重新部署
-
-或本地 CLI 直接部署:
-
-```bash
-npm install -g edgeone
-edgeone login
-edgeone makers deploy -n dsh-plugin-hub
-```
 
 ## 社区
 
