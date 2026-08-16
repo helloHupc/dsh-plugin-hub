@@ -281,7 +281,7 @@ td.num{text-align:right;color:#38c4a0}.dim{color:#5b667a}
         refHost = new URL(ref).hostname.slice(0, 80);
       } catch (e) {
       }
-      const ua2 = (request.headers.get("user-agent") || "").slice(0, 200);
+      const ua = (request.headers.get("user-agent") || "").slice(0, 200);
       const ip = request.headers.get("cf-connecting-ip") || (request.headers.get("x-forwarded-for") || "").split(",")[0] || "unknown";
       let geo = "ZZ";
       try {
@@ -290,13 +290,13 @@ td.num{text-align:right;color:#38c4a0}.dim{color:#5b667a}
         }
       } catch (e) {
       }
-      waitUntil(record(env, { p, refHost, geo, ip }));
+      waitUntil(record({ p, refHost, geo, ip, ua }));
       return new Response(null, { status: 204 });
     } catch (e) {
       return new Response(null, { status: 204 });
     }
   }
-  async function record(env, { p, refHost, geo, ip }) {
+  async function record({ p, refHost, geo, ip, ua }) {
     try {
       if (typeof my_kv === "undefined")
         return;
