@@ -24,7 +24,15 @@ body {
   padding: 26px 0 18px;
 }
 .topbar h1 { margin: 0; font-size: 24px; letter-spacing: .5px; display: flex; align-items: center; gap: 10px; }
-.logo { width: 28px; height: 28px; }
+.logo-wrap {
+  display: inline-flex;
+  background: #fff;
+  border-radius: 8px;
+  padding: 4px;
+  box-shadow: 0 2px 8px rgba(0,0,0,.35);
+  flex: none;
+}
+.logo { width: 26px; height: 26px; display: block; }
 .sub { color: var(--dim); margin: 4px 0 14px; }
 .stats { display: flex; gap: 22px; flex-wrap: wrap; }
 .stat { color: var(--dim); }
