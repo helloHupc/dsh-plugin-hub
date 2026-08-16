@@ -1,12 +1,12 @@
 // 私有统计报表:GET /api/stats?key=你的密钥
-// 密钥来自环境变量 STATS_KEY(或代码内 FALLBACK_KEY)。不要公开此 URL。
-const FALLBACK_KEY = "dsh-stats-8f3a2c";
+// 密钥来自环境变量 STATS_KEY(控制台 项目设置→环境变量,或 edgeone makers env set)。
+// 不要公开此 URL。
 
 export async function onRequestGet(context) {
   const { request, env } = context;
   const url = new URL(request.url);
-  const key = env.STATS_KEY || FALLBACK_KEY;
-  if (url.searchParams.get("key") !== key) {
+  const key = env.STATS_KEY;
+  if (!key || url.searchParams.get("key") !== key) {
     return new Response("Forbidden", { status: 403 });
   }
   try {

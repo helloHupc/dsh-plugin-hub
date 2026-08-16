@@ -1,0 +1,14 @@
+{
+  "routes": [
+    {
+      "src": "^/api/stats$",
+      "methods": [
+        "GET"
+      ]
+    },
+    {
+      "src": "^/api/t$"
+    }
+  ],
+  "middleware": null
+}
