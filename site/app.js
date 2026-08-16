@@ -12,6 +12,20 @@ const state = {
 
 const $ = (id) => document.getElementById(id);
 
+// ---- 主题切换(默认深色,可手动切浅色,localStorage 记忆) ----
+const themeBtn = $("theme-btn");
+function applyTheme(t) {
+  document.documentElement.dataset.theme = t;
+  themeBtn.textContent = t === "dark" ? "🌙" : "☀️";
+  themeBtn.title = t === "dark" ? "切换到浅色外观" : "切换到深色外观";
+}
+applyTheme(document.documentElement.dataset.theme || "dark");
+themeBtn.addEventListener("click", () => {
+  const next = document.documentElement.dataset.theme === "dark" ? "light" : "dark";
+  try { localStorage.setItem("dsh-theme", next); } catch (e) { /* ignore */ }
+  applyTheme(next);
+});
+
 async function init() {
   try {
     const res = await fetch("data/plugins.json", { cache: "no-cache" });
