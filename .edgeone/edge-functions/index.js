@@ -295,7 +295,7 @@ td.num{text-align:right;color:#38c4a0}.dim{color:#5b667a}
       const hkey = "uv:" + day + ":" + (h >>> 0).toString(36);
       const seen = await my_kv.get(hkey) !== null;
       if (!seen) {
-        await my_kv.put(hkey, "1", { expirationTtl: 86400 });
+        await my_kv.put(hkey, "1");
       }
       let st = {};
       try {
