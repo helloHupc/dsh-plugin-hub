@@ -251,11 +251,11 @@ td.num{text-align:right;color:#38c4a0}.dim{color:#5b667a}
       } catch (e) {
       }
       const ua = (request.headers.get("user-agent") || "").slice(0, 200);
-      const ip = request.headers.get("cf-connecting-ip") || (request.headers.get("x-forwarded-for") || "").split(",")[0] || "unknown";
+      const ip = request.eo && request.eo.clientIp || request.headers.get("cf-connecting-ip") || (request.headers.get("x-forwarded-for") || "").split(",")[0] || "unknown";
       let geo = "ZZ";
       try {
-        if (request.eo && request.eo.geo && request.eo.geo.country) {
-          geo = request.eo.geo.country.slice(0, 2);
+        if (request.eo && request.eo.geo && request.eo.geo.countryCodeAlpha2) {
+          geo = request.eo.geo.countryCodeAlpha2.slice(0, 2);
         }
       } catch (e) {
       }
